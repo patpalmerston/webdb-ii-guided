@@ -60,34 +60,79 @@ router.post('/', (req, res) => {
     })
 });
 
+
+// put 1.a
+// router.put('/:id', (req, res) => {
+//   // update roles
+//  const changes = req.body;
+//  const { id } = req.params;
+
+//  db('roles')
+//   .where({ id: id }) //or .where({id: req.params.id})^^
+//   .update(changes) //or req.body^^
+//   .then(count => {
+//     res.status(200).json(count)
+//   })
+//   .catch(err => {
+//     res.status(500).json(err)
+//   })
+// });
+
+
+// put 1.b
 router.put('/:id', (req, res) => {
-  // update roles
- const changes = req.body;
- const { id } = req.params;
-
- db('roles')
-  .where({ id: id })
-  .update(changes)
-  .then(count => {
-    res.status(200).json(count)
-  })
-  .catch(err => {
-    res.status(500).json(err)
-  })
-});
-
-router.delete('/:id', (req, res) => {
-  // remove roles (inactivate the role)
-  const { id } = req.params;
 
   db('roles')
-    .where({ id })
-    .del()
+    .where({id: req.params.id})
+    .update(req.body)
     .then(count => {
-      res.status(200).json(count)
+      if(count > 0) {
+        db('roles')
+        .where({id: req.params.id})
+        .first()
+        .then(role => {
+          res.status(200).json(role)
+        })
+      }else {
+        res.status(404).json({message: 'role not found'})
+      }
     })
     .catch(err => {
-      res.status(500).json(err);
+      res.status(500).json(err)
+    })
+})
+
+//1.a
+// router.delete('/:id', (req, res) => {
+//   // remove roles (inactivate the role)
+//   const { id } = req.params;
+
+//   db('roles')
+//     .where({ id })
+//     .del()
+//     .then(count => {
+//       res.status(200).json(count)
+//     })
+//     .catch(err => {
+//       res.status(500).json(err);
+//     })
+// });
+
+
+//1.b
+router.delete('/:id', (req, res) => {
+  db('roles')
+    .where({ id: req.params.id })
+    .del()
+    .then(count => {
+      if (count > 0) {
+        res.status(204).end();
+      } else {
+        res.status(404).json({ message: 'Role ID not Fount' });
+      }
+    })
+    .catch(err => {
+      res.status(500).json(err)
     })
 });
 
